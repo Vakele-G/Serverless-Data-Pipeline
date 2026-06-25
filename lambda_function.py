@@ -1,8 +1,8 @@
-import boto3
+import boto3  # The official AWS SDK for Python. It allows the code to S3
 import urllib.parse
+import json
 from clean_data import clean_csv_string
 
-# boto3 is the official AWS SDK for Python. It allows the code to S3
 
 s3_client = boto3.client("s3")
 
@@ -42,7 +42,7 @@ def lambda_handler(event, context):
         print(f"Success! Cleaned file saved to {destination_bucket}/{clean_file_key}")
 
         return {"statusCode": 200,
-                "body": "File processed successfully"
+                "body": json.dumps("File processed successfully")
                 }
     except Exception as e:
         print(f"Error processing file {file_key}: {str(e)}")

@@ -1,38 +1,34 @@
-import boto3  # The official AWS SDK for Python. It allows the code to S3
+import boto3
 import urllib.parse
 import json
-from clean_data import clean_csv_string
-
+from data_cleaner import clean_csv_string
 
 s3_client = boto3.client("s3")
 
 def lambda_handler(event, context):
-    """
-    This is the front door. AWS automatically passes the 'event' dictionary
-    which contains the details about the file that was just uploaded.
-    """
-
-    # Extract the bucket name and file name from the event 
+    # Extract bucket and file key from the S3 trigger event
     source_bucket = event["Records"][0]["s3"]["bucket"]["name"]
-
-    # Use urllib to safely decode the name and file name from the event
     file_key = urllib.parse.unquote_plus(event["Records"][0]["s3"]["object"]["key"], encoding="utf-8")
 
     print(f"Triggered by file: {file_key} in bucket: {source_bucket}")
 
     try:
-        # Download raw CSV file from S3 into Lambda's memory
+        # 1. Download the raw file from S3
         response = s3_client.get_object(Bucket=source_bucket, Key=file_key)
-        raw_csv_text = response["Body"].read().decode("utf-8")
+        raw_file_text = response["Body"].read().decode("utf-8")
 
-        # Pass the data into the csv cleaner function
-        clean_csv_text = clean_csv_string(raw_csv_text)
+        # 2. NEW STEP: Parse the raw text as JSON and extract the actual CSV data
+        payload = json.loads(raw_file_text)
+        actual_csv_text = payload.get("raw_csv", "")
 
-        # Define where the cleaned data is going
+        # 3. Pass the extracted data into your original csv cleaner function
+        clean_csv_text = clean_csv_string(actual_csv_text)
+
+        # 4. Define destination settings
         destination_bucket = "vakele-processed-data-output-2026"
-        clean_file_key =  f"clean_{file_key}"
+        clean_file_key = f"clean_{file_key}"
 
-        # Upload cleaned data to output bucket
+        # 5. Upload the genuinely cleaned CSV data
         s3_client.put_object(
             Bucket=destination_bucket,
             Key=clean_file_key,
@@ -41,9 +37,10 @@ def lambda_handler(event, context):
 
         print(f"Success! Cleaned file saved to {destination_bucket}/{clean_file_key}")
 
-        return {"statusCode": 200,
-                "body": json.dumps("File processed successfully")
-                }
+        return {
+            "statusCode": 200,
+            "body": json.dumps("File processed successfully")
+        }
     except Exception as e:
         print(f"Error processing file {file_key}: {str(e)}")
         raise e

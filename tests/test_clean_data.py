@@ -1,5 +1,5 @@
 import unittest
-from clean_data import clean_csv_string
+from data_cleaner import clean_csv_string
 
 class TestDataCleaner(unittest.TestCase):
 

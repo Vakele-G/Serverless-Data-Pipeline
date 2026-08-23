@@ -1,0 +1,5 @@
+llama-index-core
+llama-index-llms-openrouter
+llama-index-embeddings-huggingface
+sentence-transformers
+boto3

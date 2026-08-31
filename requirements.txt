@@ -1,4 +1,4 @@
---extra-index-url https://pytorch.org
+--extra-index-url https://download.pytorch.org/whl/cpu
 torch==2.4.0
 transformers<4.53.0
 llama-index-core

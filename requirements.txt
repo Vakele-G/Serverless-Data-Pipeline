@@ -1,3 +1,6 @@
+--extra-index-url https://pytorch.org
+torch==2.4.0
+transformers<4.53.0
 llama-index-core
 llama-index-llms-openrouter
 llama-index-embeddings-huggingface

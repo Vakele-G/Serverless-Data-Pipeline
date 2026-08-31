@@ -1,10 +1,19 @@
 FROM public.ecr.aws/lambda/python:3.11
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Update core build utilities, upgrade pip/setuptools
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
-# Download HuggingFace model into the container image
-RUN python -c "from llama_index.embeddings.huggingface import HuggingFaceEmbedding; HuggingFaceEmbedding(model_name='BAAI/bge-small-en-v1.5')"
+# Copy requirements directly into the Lambda task root
+COPY requirements.txt ${LAMBDA_TASK_ROOT}
+
+# Install packages forcing pre-compiled binaries (prevents compiling numpy from source)
+RUN pip install --no-cache-dir --only-binary=:all: -r ${LAMBDA_TASK_ROOT}/requirements.txt
+
+# Set a specific cache directory so the model stays packed inside the image
+ENV HF_HOME=${LAMBDA_TASK_ROOT}/.cache/huggingface
+
+# Download and bake HuggingFace model into the container image
+RUN python -c "import builtins, torch; builtins.nn = torch.nn; from llama_index.embeddings.huggingface import HuggingFaceEmbedding; HuggingFaceEmbedding(model_name='BAAI/bge-small-en-v1.5', cache_folder='${HF_HOME}')"
 
 COPY app.py ${LAMBDA_TASK_ROOT}
 

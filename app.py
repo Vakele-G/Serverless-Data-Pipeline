@@ -5,6 +5,10 @@ from llama_index.core import StorageContext, load_index_from_storage, Settings
 from llama_index.llms.openrouter import OpenRouter
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 
+
+# Force all generic home-directory caching to the writable /tmp folder
+os.environ["HOME"] = "/tmp"
+
 s3 = boto3.client("s3")
 BUCKET_NAME = os.environ.get("S3_BUCKET_NAME")
 INDEX_PATH = "/tmp/storage"
@@ -21,7 +25,7 @@ def initialize_engine():
             s3.download_file(BUCKET_NAME, obj["Key"], os.path.join(INDEX_PATH, filename))
 
     # Configure models
-    Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
+    Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5", cache_folder=os.environ.get("HF_HOME"))
     Settings.llm = OpenRouter(
         api_key=os.environ.get("OPENROUTER_API_KEY"),
         model="meta-llama/llama-3.3-70b-instruct:free",

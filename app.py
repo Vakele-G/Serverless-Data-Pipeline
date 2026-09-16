@@ -41,12 +41,13 @@ def initialize_engine():
 query_engine = None
 
 def lambda_handler(event, context):
+    global query_engine
     try:
         if query_engine is None:
             print("Cold start: Initializing RAG engine...")
             query_engine = initialize_engine()
             print("Engine initialized successfully.")
-            
+
         body = json.loads(event.get("body", "{}"))
         question = body.get("question", "")
         

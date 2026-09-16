@@ -28,7 +28,7 @@ def initialize_engine():
     Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5", cache_folder=os.environ.get("HF_HOME"))
     Settings.llm = OpenRouter(
         api_key=os.environ.get("OPENROUTER_API_KEY"),
-        model="meta-llama/llama-3.3-70b-instruct:free",
+        model="openrouter/free",
         max_tokens=512,
         temperature=0.1
     )

@@ -1,10 +1,6 @@
 import os
 import json
 import boto3
-from llama_index.core import StorageContext, load_index_from_storage, Settings
-from llama_index.llms.openrouter import OpenRouter
-from llama_index.embeddings.huggingface import HuggingFaceEmbedding
-
 
 # Force all generic home-directory caching to the writable /tmp folder
 os.environ["HOME"] = "/tmp"
@@ -13,8 +9,16 @@ s3 = boto3.client("s3")
 BUCKET_NAME = os.environ.get("S3_BUCKET_NAME")
 INDEX_PATH = "/tmp/storage"
 
+query_engine = None
+
 # Global initialization (Cold Start cache)
 def initialize_engine():
+    from llama_index.core import StorageContext, load_index_from_storage, Settings
+    from llama_index.llms.openrouter import OpenRouter
+    from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+
+    print("Loading models...")
+
     os.makedirs(INDEX_PATH, exist_ok=True)
     
     # Download index files from S3 to Lambda's /tmp directory
@@ -35,10 +39,9 @@ def initialize_engine():
 
     storage_context = StorageContext.from_defaults(persist_dir=INDEX_PATH)
     index = load_index_from_storage(storage_context)
+
     return index.as_query_engine(similarity_top_k=4)
 
-
-query_engine = None
 
 def lambda_handler(event, context):
     global query_engine

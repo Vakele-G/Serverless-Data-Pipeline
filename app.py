@@ -37,10 +37,16 @@ def initialize_engine():
     index = load_index_from_storage(storage_context)
     return index.as_query_engine(similarity_top_k=4)
 
-query_engine = initialize_engine()
+
+query_engine = None
 
 def lambda_handler(event, context):
     try:
+        if query_engine is None:
+            print("Cold start: Initializing RAG engine...")
+            query_engine = initialize_engine()
+            print("Engine initialized successfully.")
+            
         body = json.loads(event.get("body", "{}"))
         question = body.get("question", "")
         

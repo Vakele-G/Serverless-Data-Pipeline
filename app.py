@@ -45,6 +45,18 @@ def initialize_engine():
 
 def lambda_handler(event, context):
     global query_engine
+
+    expected_api_key = os.environ.get("API_SECRET_KEY")
+    headers = event.get("headers", {})
+
+    provided_api_key = headers.get("x-api-key")
+
+    if not expected_api_key or provided_api_key != expected_api_key:
+        return {
+            "statusCode": 401,
+            "body": json.dumps({"error": "Unauthorized: Invalid or missing API key"})
+        }
+
     try:
         if query_engine is None:
             print("Cold start: Initializing RAG engine...")

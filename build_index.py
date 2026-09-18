@@ -5,7 +5,7 @@ from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
 
 # Read the PDF
-documents = SimpleDirectoryReader(input_files=["data/N5-Industrial-Electronics.pdf"]).load_data()
+documents = SimpleDirectoryReader(input_dir="data").load_data()
 
 # Build the index and save to the local storage folder
 index = VectorStoreIndex.from_documents(documents, embed_model=embed_model)

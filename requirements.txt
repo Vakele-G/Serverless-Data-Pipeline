@@ -4,5 +4,6 @@ transformers<4.53.0
 llama-index-core
 llama-index-llms-openrouter
 llama-index-embeddings-huggingface
+llama-index-llms-groq
 sentence-transformers
 boto3

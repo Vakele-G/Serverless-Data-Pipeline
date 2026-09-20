@@ -2,8 +2,8 @@ import os
 import json
 import boto3
 
-# Force all generic home-directory caching to the writable /tmp folder
-os.environ["HOME"] = "/tmp"
+
+os.environ["HOME"] = "/tmp"    # Force all generic home-directory caching to the writable /tmp folder
 
 s3 = boto3.client("s3")
 BUCKET_NAME = os.environ.get("S3_BUCKET_NAME")
@@ -16,6 +16,7 @@ def initialize_engine():
     from llama_index.core import StorageContext, load_index_from_storage, Settings
     from llama_index.llms.openrouter import OpenRouter
     from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+    from llama_index.llms.groq import Groq
 
     print("Loading models...")
 
@@ -30,12 +31,16 @@ def initialize_engine():
 
     # Configure models
     Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5", cache_folder=os.environ.get("HF_HOME"))
-    Settings.llm = OpenRouter(
-        api_key=os.environ.get("OPENROUTER_API_KEY"),
-        model="google/gemma-2-9b-it:free",
-        max_tokens=512,
-        temperature=0.1
+
+    # selected_model = os.environ.get("LLM_MODEL", "openrouter/free")
+    # print(f"Initializing OpenRouter with model: {selected_model}")
+    # Settings.llm = OpenRouter(model=selected_model)
+
+    Settings.llm = Groq(
+        model="openai/gpt-oss-120b", 
+        api_key=os.environ.get("GROQ_API_KEY")
     )
+
 
     storage_context = StorageContext.from_defaults(persist_dir=INDEX_PATH)
     index = load_index_from_storage(storage_context)

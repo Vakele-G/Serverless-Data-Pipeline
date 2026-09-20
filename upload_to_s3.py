@@ -13,7 +13,7 @@ STORAGE_DIR = "./storage"
 S3_PREFIX = "storage/"  # The folder inside the S3 bucket
 
 def upload_directory_to_s3():
-    # Initialize the S3 client using your local AWS CLI credentials
+    # Initialize the S3 client using local AWS CLI credentials
     s3_client = boto3.client("s3")
     
     if not os.path.exists(STORAGE_DIR):
@@ -29,7 +29,6 @@ def upload_directory_to_s3():
             local_path = os.path.join(root, file)
             
             # Construct the destination path in S3
-            # Example: ./storage/docstore.json -> storage/docstore.json
             relative_path = os.path.relpath(local_path, STORAGE_DIR)
             s3_key = os.path.join(S3_PREFIX, relative_path).replace("\\", "/")
 

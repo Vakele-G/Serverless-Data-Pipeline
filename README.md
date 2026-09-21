@@ -1,6 +1,8 @@
 WTC-PCWZJ6UM
 # Serverless-RAG-system
 
+Demo video: https://youtu.be/wb73RsXOxLQ?si=pPROo0xCBRiklGND
+
 **What is this project?**
 This is a Retrieval-Augmented Generation (RAG) pipeline deployed on AWS using serverless infrastructure.
 You upload a PDF document to the system and ask it questions based on that document. It will read through provided documents and generate a clear, accurate answer based strictly on the text.
@@ -20,3 +22,23 @@ The Stack
         Embeddings: BAAI/bge-small-en-v1.5 for semantic chunking and high-fidelity search context.
 
         Generation: Meta's Llama 3.3 model (accessed via OpenRouter) to deliver precise, context-aware technical answers.
+
+
+**Sending a request**
+
+Here are the requests for various operating systems. Edit the question as you like.
+
+Linux/macOS:
+
+    curl -X POST https://e55jmiqgza6g5262as3h5k6nya0tjqgf.lambda-url.eu-north-1.on.aws/ \
+      -H "Content-Type: application/json" \
+      -H "x-api-key: ragsysAPIkey" \
+      -d '{"question": "What is this book about?"}'
+
+Windows Command Prompt:
+
+    curl -X POST https://e55jmiqgza6g5262as3h5k6nya0tjqgf.lambda-url.eu-north-1.on.aws/ -H "Content-Type: application/json" -H "x-api-key: ragsysAPIkey" -d "{\"question\": \"What is this book about?\"}"
+    
+Windows PowerShell:
+
+    Invoke-RestMethod -Uri "https://e55jmiqgza6g5262as3h5k6nya0tjqgf.lambda-url.eu-north-1.on.aws/" -Method Post -Headers @{ "Content-Type"="application/json"; "x-api-key"="ragsysAPIkey" } -Body '{"question": "What is this book about?"}'
